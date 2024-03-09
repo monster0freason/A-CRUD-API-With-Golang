@@ -106,10 +106,17 @@ Explanation:
 #### `getMovies`
 
 ```go
+// getMovies is a handler function for the GET request to fetch all movies.
 func getMovies(w http.ResponseWriter, r *http.Request) {
+    // Set the Content-Type header of the response to indicate JSON format.
     w.Header().Set("Content-Type", "application/json")
+    
+    // Encode the 'movies' slice into JSON format and write it to the response.
+    // 'json.NewEncoder(w)' creates a new JSON encoder that writes to the ResponseWriter 'w'.
+    // 'Encode(movies)' encodes the 'movies' slice and writes it to the ResponseWriter.
     json.NewEncoder(w).Encode(movies)
 }
+
 ```
 
 Explanation:
@@ -122,17 +129,29 @@ Explanation:
 #### `deleteMovie`
 
 ```go
+// deleteMovie handles the HTTP DELETE request to delete a movie by its ID.
 func deleteMovie(w http.ResponseWriter, r *http.Request) {
+    // Set the response header to indicate JSON content type
     w.Header().Set("Content-Type", "application/json")
+
+    // Extract parameters from the request URL
     params := mux.Vars(r)
+
+    // Iterate through the list of movies
     for index, item := range movies {
+        // Check if the ID of the current movie matches the ID specified in the request
         if item.ID == params["id"] {
+            // If found, remove the movie from the slice by slicing it
             movies = append(movies[:index], movies[index+1:]...)
+            // Exit the loop since the movie is found and deleted
             break
         }
     }
+
+    // Encode the updated list of movies into JSON format and send it in the response
     json.NewEncoder(w).Encode(movies)
 }
+
 ```
 
 Explanation:
@@ -146,17 +165,28 @@ Explanation:
 #### `getMovie`
 
 ```go
+// Define a function named getMovie with parameters w (http.ResponseWriter) and r (*http.Request)
 func getMovie(w http.ResponseWriter, r *http.Request) {
+    // Set the response header to indicate JSON content type
     w.Header().Set("Content-Type", "application/json")
+    
+    // Extract the parameters (including the movie ID) from the request URL
     params := mux.Vars(r)
+    
+    // Iterate through the list of movies
     for _, item := range movies {
+        // Check if the ID of the current movie matches the ID provided in the request
         if item.ID == params["id"] {
+            // If a match is found, encode the movie details into JSON format and write it to the response
             json.NewEncoder(w).Encode(item)
-            return
+            return // Exit the function
         }
     }
+    
+    // If no matching movie is found, encode an empty Movie struct into JSON format and write it to the response
     json.NewEncoder(w).Encode(&Movie{})
 }
+
 ```
 
 Explanation:
@@ -171,13 +201,25 @@ Explanation:
 
 ```go
 func createMovie(w http.ResponseWriter, r *http.Request) {
+    // Set the content type of the response to JSON
     w.Header().Set("Content-Type", "application/json")
+
+    // Declare a variable to hold the decoded JSON data
     var movie Movie
+    
+    // Decode the JSON data from the request body into the movie variable
     _ = json.NewDecoder(r.Body).Decode(&movie)
-    movie.ID = strconv.Itoa(rand.Intn(1000000)) // Mock ID - not safe for production
+    
+    // Generate a mock ID for the new movie (not safe for production)
+    movie.ID = strconv.Itoa(rand.Intn(1000000))
+    
+    // Append the new movie to the movies slice
     movies = append(movies, movie)
+    
+    // Encode the newly created movie as JSON and write it to the response
     json.NewEncoder(w).Encode(movie)
 }
+
 ```
 
 Explanation:
@@ -193,21 +235,40 @@ Explanation:
 
 ```go
 func updateMovie(w http.ResponseWriter, r *http.Request) {
+    // Set the response header to indicate JSON content type
     w.Header().Set("Content-Type", "application/json")
+    
+    // Extract route parameters from the request
     params := mux.Vars(r)
+    
+    // Iterate through the movies slice to find the movie with the specified ID
     for index, item := range movies {
-        if item.ID == params["id"] {
+        if item.ID == params["id"] { // Check if the movie ID matches the requested ID
+            // Remove the existing movie from the movies slice
             movies = append(movies[:index], movies[index+1:]...)
+            
+            // Decode the request body JSON into a new movie object
             var movie Movie
             _ = json.NewDecoder(r.Body).Decode(&movie)
+            
+            // Set the ID of the updated movie to the requested ID
             movie.ID = params["id"]
+            
+            // Append the updated movie to the movies slice
             movies = append(movies, movie)
+            
+            // Encode the updated movie as JSON and write it to the response
             json.NewEncoder(w).Encode(movie)
+            
+            // Return to exit the function after updating the movie
             return
         }
     }
+    
+    // If the movie with the specified ID is not found, encode the movies slice and write it to the response
     json.NewEncoder(w).Encode(movies)
 }
+
 ```
 
 Explanation:
@@ -226,14 +287,32 @@ Explanation:
 ### Route Definitions
 
 ```go
+// Define routes for various CRUD operations using HandleFunc.
+// For each route, specify the corresponding HTTP method.
+// Utilize path variables to handle dynamic IDs.
+
+// Handle GET request to fetch all movies
 r.HandleFunc("/movies", getMovies).Methods("GET")
+
+// Handle GET request to fetch a single movie by ID
 r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
+
+// Handle POST request to create a new movie
 r.HandleFunc("/movies", createMovie).Methods("POST")
+
+// Handle PUT request to update an existing movie by ID
 r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
+
+// Handle DELETE request to delete a movie by ID
 r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 
+// Print a message indicating the server is starting at port 8000
 fmt.Print("Starting server at port 8000\n")
-log.Fatal(http.ListenAndServe(":8000",r))
+
+// Start the HTTP server listening on port 8000
+// Log any fatal errors that occur during server operation
+log.Fatal(http.ListenAndServe(":8000", r))
+
 ```
 
 Explanation:
