@@ -16,7 +16,7 @@ Before you begin, make sure you have the following installed:
 1. Clone the repository to your local machine:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/monster0freason/A-CRUD-API-With-Golang
 ```
 
 2. Navigate to the project directory:
@@ -93,6 +93,8 @@ type Director struct {
     FirstName string `json:"firstName"`
     LastName  string `json:"lastName"`
 }
+
+var movies []Movie
 ```
 
 Explanation:
@@ -229,12 +231,84 @@ r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 r.HandleFunc("/movies", createMovie).Methods("POST")
 r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
+
+fmt.Print("Starting server at port 8000\n")
+log.Fatal(http.ListenAndServe(":8000",r))
 ```
 
 Explanation:
-- Defines routes for various CRUD operations.
-- Specifies the corresponding HTTP methods for each route.
-- Utilizes path variables to handle dynamic IDs.
+
+The route definitions establish endpoints for CRUD operations, with each route specifying the corresponding HTTP method. Path variables are employed to handle dynamic IDs, enabling the API to interact with specific resources efficiently. This approach adheres to RESTful design principles, ensuring clarity, maintainability, and security in API routing.
+
+- **`r.HandleFunc(path, handler).Methods(httpMethod)`:**
+  - This statement is used to define routes for various CRUD operations in the API.
+  - `r` is the instance of the Gorilla Mux router (`mux.Router`) that handles incoming HTTP requests.
+  - `HandleFunc` is a method provided by the Gorilla Mux router to register a new route with the router.
+  - `path` is the URL path pattern for the route. It specifies the endpoint where the HTTP request should be routed.
+  - `handler` is the function that should be called to handle the HTTP request when it matches the specified path.
+  - `httpMethod` is the HTTP method (e.g., GET, POST, PUT, DELETE) associated with the route.
+
+- **Using Path Variables `{id}`:**
+  - The routes `/movies/{id}` are examples of routes that use path variables. Path variables are specified by curly braces `{}` in the route definition.
+  - The path variable `{id}` is used to dynamically capture the ID of a movie from the URL. This allows for fetching, updating, or deleting a specific movie based on its unique identifier.
+
+- **Specifying HTTP Methods:**
+  - The `.Methods(httpMethod)` part of each route definition specifies the HTTP method allowed for accessing that route.
+  - For example, `Methods("GET")` means that the route only responds to HTTP GET requests, while `Methods("POST")` means it only responds to HTTP POST requests, and so on.
+  - This ensures that the API adheres to the principles of RESTful design by mapping HTTP methods to CRUD operations: GET for reading, POST for creating, PUT for updating, and DELETE for deleting resources.
+
+- **Why Using Methods:**
+  - Specifying HTTP methods for each route helps in enforcing the proper usage of the API and ensures that each endpoint is only accessible via the intended HTTP method.
+  - It enhances the clarity and maintainability of the code by clearly indicating the allowed actions for each route.
+  - Additionally, it provides an additional layer of security by preventing unauthorized access to sensitive operations.
+
+
+## Testing the API with Postman
+
+1. **Setting Up Postman:**
+   - Ensure you have Postman installed on your system.
+   - Open Postman to start testing the API endpoints.
+
+2. **Creating Requests:**
+   - Create a new folder within Postman to organize your requests. For example, name it "Go Movies".
+
+3. **Fetching All Movies (GET Request):**
+   - Create a new request within the "Go Movies" folder to retrieve all movies from the API.
+   - Set the request URL to `http://localhost:8000/movies`.
+   - Send the request to fetch all movies in JSON format.
+
+4. **Fetching a Movie by ID (GET Request):**
+   - Create another request within the same folder to fetch a specific movie by its ID.
+   - Set the request URL to `http://localhost:8000/movies/{id}`, replacing `{id}` with the ID of the desired movie.
+   - Specify the ID of the movie to retrieve, for example, `/1` to fetch the first movie.
+   - Send the request to retrieve the details of the specified movie.
+
+5. **Creating a New Movie (POST Request):**
+   - Create a new request within the "Go Movies" folder to add a new movie to the API.
+   - Set the request URL to `http://localhost:8000/movies` and choose the HTTP method as POST.
+   - In the request body, provide JSON data representing the new movie to be created, excluding the ID since it will be generated automatically by the API.
+   - Send the request to create the new movie and receive a response containing the details of the newly created movie, including the automatically generated ID.
+
+6. **Updating an Existing Movie (PUT Request):**
+   - Create another request to update an existing movie in the API.
+   - Set the request URL to `http://localhost:8000/movies/{id}`, replacing `{id}` with the ID of the movie to be updated.
+   - Specify the ID of the movie to update and set the HTTP method to PUT.
+   - In the request body, provide JSON data representing the updated details of the movie.
+   - Send the request to update the movie and receive a response containing the updated details.
+
+7. **Deleting a Movie (DELETE Request):**
+   - Create a new request to delete a movie from the API.
+   - Set the request URL to `http://localhost:8000/movies/{id}`, replacing `{id}` with the ID of the movie to be deleted.
+   - Specify the ID of the movie to delete and set the HTTP method to DELETE.
+   - Send the request to delete the movie and receive a confirmation response.
+
+8. **Verifying Changes:**
+   - Verify the changes made to the movies by examining the responses from each request.
+   - Check the addition, retrieval, updating, and deletion of movies to ensure that the API functions correctly.
+
+
+
+Postman serves as a versatile tool for testing the functionality of the CRUD API, allowing you to interact with the API endpoints and verify their behavior effectively.
 
 ## Testing the API
 
