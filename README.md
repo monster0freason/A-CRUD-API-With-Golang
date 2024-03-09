@@ -43,6 +43,10 @@ The server will start running on port 8000.
 - `main.go`: Contains the main code for the CRUD API.
 - `README.md`: The documentation you are currently reading.
 
+## Routes
+![Routes](images/routes.png)
+![Routes](images/routes2.png)
+
 ## Understanding the Code
 
 ### Package Imports
